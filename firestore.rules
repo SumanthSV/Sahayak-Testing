@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Teachers can read/write their own data
+    match /teachers/{teacherId} {
+      allow read, write: if request.auth != null && request.auth.uid == teacherId;
+    }
+    
+    // Generated content - teachers can only access their own content
+    match /generated_content/{contentId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.teacherId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.teacherId;
+    }
+    
+    // Students - teachers can only access their own students
+    match /students/{studentId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.teacherId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.teacherId;
+    }
+    
+    // Lesson plans - teachers can only access their own plans
+    match /lesson_plans/{planId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.teacherId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.teacherId;
+    }
+  }
+}
