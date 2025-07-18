@@ -170,24 +170,6 @@ const Settings: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
               <div>
-                <h3 className="font-medium text-gray-800">Push Notifications</h3>
-                <p className="text-sm text-gray-600">Get notified about important updates</p>
-              </div>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setNotifications(!notifications)}
-                className={`w-12 h-6 rounded-full transition-all duration-200 ${
-                  notifications ? 'bg-green-500' : 'bg-gray-300'
-                } relative`}
-              >
-                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform duration-200 ${
-                  notifications ? 'translate-x-6' : 'translate-x-0.5'
-                }`}></div>
-              </motion.button>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-              <div>
                 <h3 className="font-medium text-gray-800">Auto-save Content</h3>
                 <p className="text-sm text-gray-600">Automatically save generated content</p>
               </div>

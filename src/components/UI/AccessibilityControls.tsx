@@ -84,11 +84,11 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, x: 300 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 300 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 overflow-y-auto"
+          className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
           role="dialog"
           aria-label="Accessibility Controls"
         >
@@ -96,7 +96,7 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center">
                 <Settings className="w-5 h-5 mr-2" />
-                Accessibility
+                Accessibility & Theme Settings
               </h2>
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -109,7 +109,45 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
               </motion.button>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
+              {/* Theme Settings */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                  <Palette className="w-5 h-5 mr-2" />
+                  Theme Settings
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      document.documentElement.classList.remove('dark');
+                      localStorage.setItem('theme', 'light');
+                    }}
+                    className="p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 bg-white transition-all duration-200"
+                  >
+                    <Sun className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
+                    <div className="text-sm font-medium text-gray-800">Light Mode</div>
+                    <div className="text-xs text-gray-500">Clean and bright</div>
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      document.documentElement.classList.add('dark');
+                      localStorage.setItem('theme', 'dark');
+                    }}
+                    className="p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 bg-gray-800 text-white transition-all duration-200"
+                  >
+                    <Moon className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                    <div className="text-sm font-medium">Dark Mode</div>
+                    <div className="text-xs text-gray-300">Easy on the eyes</div>
+                  </motion.button>
+                </div>
+              </div>
+
               {/* Font Size Control */}
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
@@ -246,19 +284,30 @@ export const AccessibilityControls: React.FC<AccessibilityControlsProps> = ({
               </div>
 
               {/* Reset Button */}
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  setFontSize(100);
-                  setHighContrast(false);
-                  setReducedMotion(false);
-                  setScreenReader(false);
-                }}
-                className="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-xl transition-all duration-200"
-              >
-                Reset to Defaults
-              </motion.button>
+              <div className="flex space-x-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    setFontSize(100);
+                    setHighContrast(false);
+                    setReducedMotion(false);
+                    setScreenReader(false);
+                  }}
+                  className="flex-1 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-xl transition-all duration-200"
+                >
+                  Reset to Defaults
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={onClose}
+                  className="flex-1 py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-all duration-200"
+                >
+                  Apply Settings
+                </motion.button>
+              </div>
             </div>
           </div>
         </motion.div>
