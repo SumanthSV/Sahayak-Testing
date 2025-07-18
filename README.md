@@ -120,6 +120,49 @@ firebase deploy --only functions
 npm run dev
 
 # Start Firebase emulators (optional)
+### Font Setup for Multilingual PDFs
+
+To enable multilingual PDF generation, you need to set up Base64 encoded fonts:
+
+1. **Install ttf2base64:**
+   ```bash
+   npm install -g ttf2base64
+   ```
+
+2. **Download Noto Fonts:**
+   - Visit [Google Noto Fonts](https://fonts.google.com/noto)
+   - Download the following fonts (Regular weight):
+     - Noto Sans (English)
+     - Noto Sans Devanagari (Hindi & Marathi)
+     - Noto Sans Kannada
+     - Noto Sans Tamil
+     - Noto Sans Bengali
+     - Noto Sans Gujarati
+
+3. **Convert Fonts to Base64:**
+   ```bash
+   # Create fonts directory
+   mkdir fonts
+   
+   # Convert each font to Base64
+   npx ttf2base64 ./fonts/NotoSans-Regular.ttf > ./fonts/NotoSans-Regular.txt
+   npx ttf2base64 ./fonts/NotoSansDevanagari-Regular.ttf > ./fonts/NotoSansDevanagari-Regular.txt
+   npx ttf2base64 ./fonts/NotoSansKannada-Regular.ttf > ./fonts/NotoSansKannada-Regular.txt
+   npx ttf2base64 ./fonts/NotoSansTamil-Regular.ttf > ./fonts/NotoSansTamil-Regular.txt
+   npx ttf2base64 ./fonts/NotoSansBengali-Regular.ttf > ./fonts/NotoSansBengali-Regular.txt
+   npx ttf2base64 ./fonts/NotoSansGujarati-Regular.ttf > ./fonts/NotoSansGujarati-Regular.txt
+   ```
+
+4. **Update fontBase64.ts:**
+   - Open `src/utils/fonts/fontBase64.ts`
+   - Replace the placeholder strings with the actual Base64 content from each `.txt` file
+   - Copy the entire content from each `.txt` file and paste it into the corresponding variable
+
+5. **Test Multilingual PDFs:**
+   - Generate content in different languages
+   - Download PDFs to verify proper font rendering
+   - Supported languages: English, Hindi, Kannada, Tamil, Bengali, Marathi, Gujarati
+
 firebase emulators:start
 ```
 

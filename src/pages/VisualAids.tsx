@@ -277,6 +277,7 @@ const VisualAids: React.FC = () => {
                   onRegenerate={handleRegenerate}
                   isSaving={isSaving}
                   additionalData={{
+                    language: language,
                     tips: generatedAid.materials,
                     suggestions: [`Time: ${generatedAid.timeEstimate}`, `Difficulty: ${generatedAid.difficulty}`]
                   }}

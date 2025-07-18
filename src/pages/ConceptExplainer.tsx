@@ -314,6 +314,7 @@ const ConceptExplainer: React.FC = () => {
                 onRegenerate={handleRegenerate}
                 isSaving={isSaving}
                 additionalData={{
+                  language: language,
                   tips: explanation.visualAids,
                   suggestions: explanation.activities
                 }}

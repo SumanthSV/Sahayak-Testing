@@ -295,6 +295,7 @@ const StoryGenerator: React.FC = () => {
                 onRegenerate={handleRegenerate}
                 isSaving={isSaving}
                 isEditable={true}
+                additionalData={{ language: selectedLanguage }}
                 className="h-full"
               />
             ) : (

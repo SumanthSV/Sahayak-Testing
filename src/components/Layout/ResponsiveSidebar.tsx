@@ -105,29 +105,29 @@ const ResponsiveSidebar: React.FC<ResponsiveSidebarProps> = ({ isMobile }) => {
               ${isMobile ? 'fixed' : 'fixed'} 
               left-0 top-0 h-screen w-72 
               glass-effect shadow-2xl border-r border-gray-200/50 
-              flex flex-col z-50 overflow-hidden
+              flex flex-col z-50
             `}
           >
             {/* Logo */}
-            <div className="p-6 border-b border-gray-200/50 flex-shrink-0">
+            <div className="p-4 border-b border-gray-200/50 flex-shrink-0">
               <motion.div
                 whileHover={{ scale: 1.02 }}
-                className="flex items-center space-x-3"
+                className="flex items-center space-x-2"
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
-                  <Sparkles className="w-7 h-7 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                     Sahayak AI
                   </h1>
-                  <p className="text-sm text-gray-600">Teaching Assistant</p>
+                  <p className="text-xs text-gray-600">Teaching Assistant</p>
                 </div>
               </motion.div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollable-content">
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollable-content">
               {menuItems.map((item, index) => (
                 <motion.div
                   key={item.id}
@@ -139,9 +139,9 @@ const ResponsiveSidebar: React.FC<ResponsiveSidebarProps> = ({ isMobile }) => {
                     to={item.path}
                     onClick={closeSidebar}
                     className={({ isActive }) =>
-                      `w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group touch-target focus-ring ${
+                      `w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 group touch-target focus-ring ${
                         isActive
-                          ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 shadow-md border border-purple-200/50'
+                          ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 shadow-sm border border-purple-200/50'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
                       }`
                     }
@@ -153,16 +153,16 @@ const ResponsiveSidebar: React.FC<ResponsiveSidebarProps> = ({ isMobile }) => {
                           whileTap={{ scale: 0.95 }}
                         >
                           <item.icon 
-                            className={`w-5 h-5 ${
+                            className={`w-4 h-4 ${
                               isActive ? 'text-purple-600' : item.color
                             } group-hover:scale-110 transition-transform duration-200`} 
                           />
                         </motion.div>
-                        <span className="font-medium text-responsive-sm">{item.label}</span>
+                        <span className="font-medium text-sm">{item.label}</span>
                         {isActive && (
                           <motion.div
                             layoutId="activeIndicator"
-                            className="ml-auto w-2 h-2 bg-purple-500 rounded-full"
+                            className="ml-auto w-1.5 h-1.5 bg-purple-500 rounded-full"
                           />
                         )}
                       </>
@@ -173,8 +173,8 @@ const ResponsiveSidebar: React.FC<ResponsiveSidebarProps> = ({ isMobile }) => {
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-gray-200/50 flex-shrink-0">
-              <div className="text-center text-xs text-gray-500">
+            <div className="p-3 border-t border-gray-200/50 flex-shrink-0 mt-auto">
+              <div className="text-center text-xs text-gray-500 space-y-1">
                 <p>Sahayak AI v4.0</p>
                 <p>Empowering Teachers</p>
               </div>

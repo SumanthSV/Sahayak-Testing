@@ -57,7 +57,9 @@ export const OutputCard: React.FC<OutputCardProps> = ({
   };
 
   const handleDownloadPDF = () => {
-    generatePDF(content, `${type}_${title.replace(/\s+/g, '_')}`);
+    // Extract language from additionalData, default to 'en'
+    const language = additionalData?.language || 'en';
+    generatePDF(content, `${type}_${title.replace(/\s+/g, '_')}`, language);
     toast.success('PDF downloaded successfully!');
   };
 
@@ -254,7 +256,43 @@ export const OutputCard: React.FC<OutputCardProps> = ({
       <div className={`p-6 ${getCardStyle()}`}>
         {activeTab === 'content' && (
           <div className="prose prose-sm max-w-none">
-            <pre className="whitespace-pre-wrap text-gray-800 font-sans leading-relaxed text-sm">
+            {/* Scrollable content container with chalkboard styling */}
+            <div className="max-h-96 overflow-y-auto bg-slate-800 text-green-400 p-4 rounded-lg border-2 border-slate-600 font-mono text-sm leading-relaxed scrollbar-thin scrollbar-thumb-slate-600 scrollbar-track-slate-800">
+              <pre className="whitespace-pre-wrap">
+                {content}
+              </pre>
+            </div>
+          </div>
+        )}
+        
+        {activeTab === 'tips' && additionalData?.tips && (
+          <div className="max-h-96 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            {additionalData.tips.map((tip: string, index: number) => (
+              <div key={index} className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs font-bold">{index + 1}</span>
+                </div>
+                <p className="text-gray-700 text-sm">{tip}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {activeTab === 'suggestions' && additionalData?.suggestions && (
+          <div className="max-h-96 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            {additionalData.suggestions.map((suggestion: string, index: number) => (
+              <div key={index} className="flex items-start space-x-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
+                <p className="text-gray-700 text-sm">{suggestion}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
               {content}
             </pre>
           </div>

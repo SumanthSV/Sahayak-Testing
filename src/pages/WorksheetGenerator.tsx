@@ -341,6 +341,7 @@ const WorksheetGenerator: React.FC = () => {
                     </div>
                     <p className="text-sm text-gray-500">
                       Supported formats: JPG, PNG, PDF
+                    additionalData={{ language: language }}
                     </p>
                   </div>
                 )}

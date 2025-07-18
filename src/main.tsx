@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 import App from './App.tsx';
 import i18n from './config/i18n';
 import './index.css';
+import './utils/pdfMakeConfig'; // Initialize pdfMake configuration
 
 // Service Worker registration for offline support
 if ('serviceWorker' in navigator) {
