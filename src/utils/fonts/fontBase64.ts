@@ -65,3 +65,102 @@ export const isFontAvailable = (language: string): boolean => {
   const fontData = fontBase64Data[language];
   return fontData && fontData !== 'PASTE_NOTO_SANS_BASE64_HERE' && fontData.length > 100;
 };
+
+// Helper function to get all available languages with fonts
+export const getAvailableLanguages = (): string[] => {
+  return Object.keys(fontBase64Data).filter(lang => isFontAvailable(lang));
+};
+
+// Language display names for UI
+export const languageNames: { [key: string]: { native: string; english: string } } = {
+  en: { native: 'English', english: 'English' },
+  hi: { native: 'हिंदी', english: 'Hindi' },
+  kn: { native: 'ಕನ್ನಡ', english: 'Kannada' },
+  mr: { native: 'मराठी', english: 'Marathi' },
+  ta: { native: 'தமிழ்', english: 'Tamil' },
+  bn: { native: 'বাংলা', english: 'Bengali' },
+  gu: { native: 'ગુજરાતી', english: 'Gujarati' },
+};
+
+// Font loading status for debugging
+export const getFontStatus = (): { [key: string]: boolean } => {
+  const status: { [key: string]: boolean } = {};
+  Object.keys(fontBase64Data).forEach(lang => {
+    status[lang] = isFontAvailable(lang);
+  });
+  return status;
+};
+
+// Validate font data integrity
+export const validateFonts = (): { valid: boolean; missing: string[]; available: string[] } => {
+  const missing: string[] = [];
+  const available: string[] = [];
+  
+  Object.keys(fontBase64Data).forEach(lang => {
+    if (isFontAvailable(lang)) {
+      available.push(lang);
+    } else {
+      missing.push(lang);
+    }
+  });
+  
+  return {
+    valid: missing.length === 0,
+    missing,
+    available
+  };
+};
+
+// Default fallback font configuration
+export const defaultFontConfig = {
+  fontFamily: 'NotoSans',
+  fontSize: 12,
+  lineHeight: 1.5,
+  encoding: 'UTF-8'
+};
+
+// Font size recommendations by language (some scripts may need larger sizes)
+export const fontSizeRecommendations: { [key: string]: number } = {
+  en: 12,
+  hi: 13, // Devanagari may need slightly larger size
+  kn: 13, // Kannada may need slightly larger size
+  mr: 13, // Marathi (Devanagari) may need slightly larger size
+  ta: 12, // Tamil works well at standard size
+  bn: 13, // Bengali may need slightly larger size
+  gu: 13, // Gujarati may need slightly larger size
+};
+
+// Text direction for each language (for future RTL support if needed)
+export const textDirection: { [key: string]: 'ltr' | 'rtl' } = {
+  en: 'ltr',
+  hi: 'ltr',
+  kn: 'ltr',
+  mr: 'ltr',
+  ta: 'ltr',
+  bn: 'ltr',
+  gu: 'ltr',
+};
+
+// Export all font constants for easy access
+export const fonts = {
+  NotoSansRegular,
+  NotoSansDevanagariRegular,
+  NotoSansKannadaRegular,
+  NotoSansTamilRegular,
+  NotoSansBengaliRegular,
+  NotoSansGujaratiRegular,
+};
+
+// Debug function to log font status
+export const logFontStatus = (): void => {
+  const status = getFontStatus();
+  console.log('Font Status:', status);
+  
+  const validation = validateFonts();
+  if (validation.valid) {
+    console.log('✅ All fonts are loaded successfully');
+  } else {
+    console.warn('⚠️ Missing fonts for languages:', validation.missing);
+    console.log('✅ Available fonts for languages:', validation.available);
+  }
+};
