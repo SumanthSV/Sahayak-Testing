@@ -292,36 +292,3 @@ export const OutputCard: React.FC<OutputCardProps> = ({
     </motion.div>
   );
 };
-
-              {content}
-            </pre>
-          </div>
-        )}
-        
-        {activeTab === 'tips' && additionalData?.tips && (
-          <div className="space-y-3">
-            {additionalData.tips.map((tip: string, index: number) => (
-              <div key={index} className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">{index + 1}</span>
-                </div>
-                <p className="text-gray-700 text-sm">{tip}</p>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {activeTab === 'suggestions' && additionalData?.suggestions && (
-          <div className="space-y-3">
-            {additionalData.suggestions.map((suggestion: string, index: number) => (
-              <div key={index} className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0" />
-                <p className="text-gray-700 text-sm">{suggestion}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
