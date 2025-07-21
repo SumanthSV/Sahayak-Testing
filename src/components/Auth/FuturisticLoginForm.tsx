@@ -46,7 +46,7 @@ const FuturisticLoginForm: React.FC<FuturisticLoginFormProps> = ({ onShowSignup 
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-black dark:via-purple-950 dark:to-black">
+    <div className="h-screen w-screen fixed inset-0 overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-black dark:via-purple-950 dark:to-black">
       {/* Animated Background */}
       <AnimatedBackground />
       
@@ -56,7 +56,7 @@ const FuturisticLoginForm: React.FC<FuturisticLoginFormProps> = ({ onShowSignup 
       </Suspense>
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+      <div className="relative z-10 h-full flex items-center justify-center p-4">
         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           
           {/* Left Panel - 3D Scene Overlay */}

@@ -22,23 +22,23 @@ export const ThreeDScene: React.FC<ThreeDSceneProps> = ({ sceneType }) => {
   if (sceneType === 'signup') {
     return (
       <div ref={sceneRef} className="absolute inset-0 pointer-events-none">
-        {/* Magical castle silhouette */}
+        {/* AI Academy silhouette */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.3, scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
-          className="absolute bottom-0 left-1/4 w-64 h-64 bg-gradient-to-t from-purple-900/50 to-transparent"
+          className="absolute bottom-0 left-1/4 w-64 h-64 bg-gradient-to-t from-blue-900/50 to-transparent"
           style={{
             clipPath: 'polygon(20% 100%, 30% 80%, 40% 85%, 50% 70%, 60% 85%, 70% 80%, 80% 100%)',
             transform: 'rotateX(10deg) rotateY(-5deg)',
           }}
         />
         
-        {/* Floating magical orbs */}
+        {/* Floating tech orbs */}
         {Array.from({ length: 8 }, (_, i) => (
           <motion.div
             key={i}
-            className="absolute w-4 h-4 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-sm"
+            className="absolute w-4 h-4 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full blur-sm"
             initial={{
               x: Math.random() * window.innerWidth,
               y: Math.random() * window.innerHeight,
