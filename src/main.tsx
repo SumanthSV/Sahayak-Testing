@@ -14,6 +14,10 @@ import '@fontsource/poppins/400.css';
 import '@fontsource/poppins/500.css';
 import '@fontsource/poppins/600.css';
 import '@fontsource/poppins/700.css';
+import '@fontsource/cinzel-decorative/400.css';
+import '@fontsource/cinzel-decorative/700.css';
+import '@fontsource/gwendolyn/400.css';
+import '@fontsource/gwendolyn/700.css';
 import './utils/pdfMakeConfig'; // Initialize pdfMake configuration
 
 // Service Worker registration for offline support

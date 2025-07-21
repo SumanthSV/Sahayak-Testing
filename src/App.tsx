@@ -10,18 +10,18 @@ import { OfflineIndicator } from './components/UI/OfflineIndicator';
 import { VoiceButton } from './components/UI/VoiceButton';
 
 // Lazy load components for better performance
-const LoginForm = React.lazy(() => import('./components/Auth/LoginForm'));
-const SignupForm = React.lazy(() => import('./components/Auth/SignupForm'));
-const Layout = React.lazy(() => import('./components/Layout/Layout'));
+const FuturisticLoginForm = React.lazy(() => import('./components/Auth/FuturisticLoginForm'));
+const FuturisticSignupForm = React.lazy(() => import('./components/Auth/FuturisticSignupForm'));
+const ModernLayout = React.lazy(() => import('./components/Layout/ModernLayout'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const StoryGenerator = React.lazy(() => import('./pages/StoryGenerator'));
-const WorksheetGenerator = React.lazy(() => import('./pages/WorksheetGenerator'));
+const ModernWorksheetGenerator = React.lazy(() => import('./pages/ModernWorksheetGenerator'));
 const ConceptExplainer = React.lazy(() => import('./pages/ConceptExplainer'));
 const VisualAids = React.lazy(() => import('./pages/VisualAids'));
 const VoiceAssessment = React.lazy(() => import('./pages/VoiceAssessment'));
 const LessonPlanner = React.lazy(() => import('./pages/LessonPlanner'));
 const StudentTracker = React.lazy(() => import('./pages/StudentTracker'));
-const Games = React.lazy(() => import('./pages/Games'));
+const MagicalGames = React.lazy(() => import('./pages/MagicalGames'));
 const Settings = React.lazy(() => import('./pages/Settings'));
 
 function App() {
@@ -92,7 +92,7 @@ function App() {
                     transition={{ duration: 0.3 }}
                     className="container-responsive"
                   >
-                    <SignupForm onBackToLogin={() => setShowSignup(false)} />
+                    <FuturisticSignupForm onBackToLogin={() => setShowSignup(false)} />
                   </motion.div>
                 } />
                 <Route path="/*" element={
@@ -104,26 +104,26 @@ function App() {
                     className="container-responsive"
                   >
                     {showSignup ? (
-                      <SignupForm onBackToLogin={() => setShowSignup(false)} />
+                      <FuturisticSignupForm onBackToLogin={() => setShowSignup(false)} />
                     ) : (
-                      <LoginForm onShowSignup={() => setShowSignup(true)} />
+                      <FuturisticLoginForm onShowSignup={() => setShowSignup(true)} />
                     )}
                   </motion.div>
                 } />
               </Routes>
             ) : (
               <Routes>
-                <Route path="/" element={<Layout />}>
+                <Route path="/" element={<ModernLayout />}>
                   <Route index element={<Navigate to="/dashboard" replace />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="stories" element={<StoryGenerator />} />
-                  <Route path="worksheets" element={<WorksheetGenerator />} />
+                  <Route path="worksheets" element={<ModernWorksheetGenerator />} />
                   <Route path="concepts" element={<ConceptExplainer />} />
                   <Route path="visuals" element={<VisualAids />} />
                   <Route path="assessment" element={<VoiceAssessment />} />
                   <Route path="planner" element={<LessonPlanner />} />
                   <Route path="tracking" element={<StudentTracker />} />
-                  <Route path="games" element={<Games />} />
+                  <Route path="games" element={<MagicalGames />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

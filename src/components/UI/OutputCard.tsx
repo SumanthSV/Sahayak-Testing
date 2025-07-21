@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { generatePDF } from '../../utils/pdfGenerator';
 import html2canvas from 'html2canvas';
+import { AnimatedAvatar } from './AnimatedAvatar';
 import toast from 'react-hot-toast';
 
 interface OutputCardProps {
@@ -169,7 +170,12 @@ export const OutputCard: React.FC<OutputCardProps> = ({
       <div className="p-4 sm:p-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1 truncate">{title}</h3>
+            <div className="flex items-center space-x-3 mb-2">
+              <AnimatedAvatar type={type} size="md" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate">{title}</h3>
+              </div>
+            </div>
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <Clock className="w-4 h-4 mr-1 flex-shrink-0" />
               <span>{timestamp.toLocaleString()}</span>

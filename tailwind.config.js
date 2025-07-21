@@ -6,6 +6,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        magical: ['Cinzel Decorative', 'serif'],
+        enchanted: ['Gwendolyn', 'cursive'],
       },
       fontSize: {
         'responsive-xs': 'var(--text-xs)',
@@ -88,6 +90,11 @@ export default {
         'xl': 'var(--radius-xl)',
         '2xl': 'var(--radius-2xl)',
       },
+      backgroundImage: {
+        'magical-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'enchanted-gradient': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'mystical-gradient': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      },
       transitionDuration: {
         'fast': 'var(--transition-fast)',
         'normal': 'var(--transition-normal)',
@@ -102,6 +109,8 @@ export default {
       animation: {
         'pulse-recording': 'pulse-recording 2s infinite',
         'loading': 'loading 1.5s infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
       },
       keyframes: {
         'pulse-recording': {
@@ -111,6 +120,14 @@ export default {
         'loading': {
           '0%': { backgroundPosition: '200% 0' },
           '100%': { backgroundPosition: '-200% 0' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'glow': {
+          '0%': { boxShadow: '0 0 5px rgba(168, 85, 247, 0.5)' },
+          '100%': { boxShadow: '0 0 20px rgba(168, 85, 247, 0.8)' },
         },
       },
       backdropBlur: {
