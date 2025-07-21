@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, BookOpen, Sparkles, UserPlus, Loader2, Robot, Wand2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, BookOpen, Sparkles, UserPlus, Loader2, Notebook as Robot, Wand2 } from 'lucide-react';
 import { FirebaseService } from '../../services/firebaseService';
 import { AnimatedBackground } from './AnimatedBackground';
 import { ThreeDScene } from './ThreeDScene';
