@@ -1,16 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  GraduationCap, 
-  Wand2, 
-  Gamepad2, 
-  Robot, 
-  BookOpen, 
-  Sparkles,
-  Crown,
-  Shield,
-  Zap
-} from 'lucide-react';
+import { GraduationCap, Wand2, Gamepad2, Notebook as Robot, BookOpen, Sparkles, Crown, Shield, Zap } from 'lucide-react';
 
 interface AnimatedAvatarProps {
   type: 'educational' | 'story' | 'game' | 'loading' | 'concept' | 'visual' | 'assessment';
