@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -19,13 +19,39 @@ import {
   Upload,
   BarChart3,
   Target,
-  Eye
+  Eye,
+  Filter,
+  Download,
+  FileSpreadsheet,
+  Search,
+  AlertTriangle,
+  Star,
+  Clock,
+  ChevronDown,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { FirebaseService, Student, StudentMark } from '../services/firebaseService';
 import { Modal } from '../components/UI/Modal';
 import { ResponsiveModal } from '../components/UI/ResponsiveModal';
 import toast from 'react-hot-toast';
+
+interface FilterState {
+  grade: string;
+  class: string;
+  section: string;
+  gender: string;
+  subject: string;
+  search: string;
+}
+
+interface ClassStats {
+  totalStudents: number;
+  averageScore: number;
+  topPerformers: Student[];
+  atRiskStudents: Student[];
+  subjectAverages: Record<string, number>;
+}
 
 const StudentTracker: React.FC = () => {
   const { t } = useTranslation();
@@ -37,8 +63,19 @@ const StudentTracker: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showMarksModal, setShowMarksModal] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    grade: '',
+    class: '',
+    section: '',
+    gender: '',
+    subject: '',
+    search: ''
+  });
 
   // Form states
   const [formData, setFormData] = useState({
@@ -87,6 +124,7 @@ const StudentTracker: React.FC = () => {
     }
   };
 
+  // Calculate performance for a student
   const calculateOverallPerformance = (studentId: string): { percentage: number; trend: 'up' | 'down' | 'stable' } => {
     const marks = studentMarks.filter(mark => mark.studentId === studentId);
     if (marks.length === 0) return { percentage: 0, trend: 'stable' };
@@ -110,6 +148,75 @@ const StudentTracker: React.FC = () => {
 
     return { percentage: averagePercentage, trend };
   };
+
+  // Filter students based on current filters
+  const filteredStudents = useMemo(() => {
+    return students.filter(student => {
+      if (filters.grade && student.grade !== filters.grade) return false;
+      if (filters.class && student.class !== filters.class) return false;
+      if (filters.section && student.section !== filters.section) return false;
+      if (filters.gender && student.gender !== filters.gender) return false;
+      if (filters.subject && !student.subjects?.includes(filters.subject)) return false;
+      if (filters.search && !student.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
+      return true;
+    });
+  }, [students, filters]);
+
+  // Calculate class statistics
+  const classStats = useMemo((): ClassStats => {
+    const studentsToAnalyze = filteredStudents;
+    
+    if (studentsToAnalyze.length === 0) {
+      return {
+        totalStudents: 0,
+        averageScore: 0,
+        topPerformers: [],
+        atRiskStudents: [],
+        subjectAverages: {}
+      };
+    }
+
+    const performances = studentsToAnalyze.map(student => ({
+      student,
+      performance: calculateOverallPerformance(student.id)
+    }));
+
+    const totalScore = performances.reduce((sum, p) => sum + p.performance.percentage, 0);
+    const averageScore = Math.round(totalScore / performances.length);
+
+    const topPerformers = performances
+      .filter(p => p.performance.percentage >= 85)
+      .sort((a, b) => b.performance.percentage - a.performance.percentage)
+      .slice(0, 3)
+      .map(p => p.student);
+
+    const atRiskStudents = performances
+      .filter(p => p.performance.percentage < 60)
+      .sort((a, b) => a.performance.percentage - b.performance.percentage)
+      .slice(0, 3)
+      .map(p => p.student);
+
+    // Calculate subject averages
+    const subjectAverages: Record<string, number> = {};
+    subjects.forEach(subject => {
+      const subjectMarks = studentMarks.filter(mark => 
+        mark.subject === subject && 
+        studentsToAnalyze.some(s => s.id === mark.studentId)
+      );
+      if (subjectMarks.length > 0) {
+        const avg = subjectMarks.reduce((sum, mark) => sum + mark.percentage, 0) / subjectMarks.length;
+        subjectAverages[subject] = Math.round(avg);
+      }
+    });
+
+    return {
+      totalStudents: studentsToAnalyze.length,
+      averageScore,
+      topPerformers,
+      atRiskStudents,
+      subjectAverages
+    };
+  }, [filteredStudents, studentMarks]);
 
   const getStudentMarks = (studentId: string) => {
     return studentMarks.filter(mark => mark.studentId === studentId);
@@ -207,7 +314,7 @@ const StudentTracker: React.FC = () => {
 
     setIsSaving(true);
     try {
-      // Check if marks already exist for this subject
+      // Check if marks already exist for this subject and test
       const existingMarks = studentMarks.filter(
         mark => mark.studentId === selectedStudent.id && 
                 mark.subject === marksData.subject &&
@@ -223,7 +330,7 @@ const StudentTracker: React.FC = () => {
           remarks: marksData.remarks,
           date: new Date()
         });
-        toast.success('Marks updated successfully!');
+        toast.success(`Marks updated for ${marksData.subject}`);
       } else {
         // Add new marks
         await FirebaseService.addStudentMark({
@@ -237,7 +344,17 @@ const StudentTracker: React.FC = () => {
           remarks: marksData.remarks,
           date: new Date()
         });
-        toast.success('Marks added successfully!');
+
+        // Check if this is a new subject for the student
+        const studentSubjects = selectedStudent.subjects || [];
+        if (!studentSubjects.includes(marksData.subject)) {
+          await FirebaseService.updateStudent(selectedStudent.id, {
+            subjects: [...studentSubjects, marksData.subject]
+          });
+          toast.success('New subject added');
+        } else {
+          toast.success(`Marks added for ${marksData.subject}`);
+        }
       }
 
       setShowMarksModal(false);
@@ -249,6 +366,87 @@ const StudentTracker: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleRemoveSubject = async (studentId: string, subject: string) => {
+    if (!confirm(`Are you sure you want to remove ${subject} from this student? This will delete all marks for this subject.`)) return;
+
+    try {
+      const student = students.find(s => s.id === studentId);
+      if (!student) return;
+
+      const updatedSubjects = (student.subjects || []).filter(s => s !== subject);
+      await FirebaseService.updateStudent(studentId, { subjects: updatedSubjects });
+
+      // Delete all marks for this subject
+      const subjectMarks = studentMarks.filter(mark => mark.studentId === studentId && mark.subject === subject);
+      for (const mark of subjectMarks) {
+        await FirebaseService.deleteStudentMark(mark.id);
+      }
+
+      toast.success(`${subject} removed successfully`);
+      loadStudents();
+    } catch (error) {
+      console.error('Error removing subject:', error);
+      toast.error('Error removing subject');
+    }
+  };
+
+  const exportToCSV = () => {
+    const studentsToExport = filteredStudents;
+    if (studentsToExport.length === 0) {
+      toast.error('No students to export');
+      return;
+    }
+
+    // Get all unique subjects
+    const allSubjects = Array.from(new Set(studentMarks.map(mark => mark.subject)));
+    
+    // Create CSV headers
+    const headers = ['Name', 'Grade', 'Class', 'Section', 'Gender', 'Roll Number', ...allSubjects];
+    
+    // Create CSV rows
+    const rows = studentsToExport.map(student => {
+      const row = [
+        student.name,
+        student.grade,
+        student.class || '',
+        student.section || '',
+        student.gender || '',
+        student.rollNumber
+      ];
+      
+      // Add subject marks
+      allSubjects.forEach(subject => {
+        const subjectMarks = getSubjectMarks(student.id, subject);
+        if (subjectMarks.length > 0) {
+          const latestMark = subjectMarks.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+          row.push(`${latestMark.score}/${latestMark.maxScore} (${latestMark.percentage}%)`);
+        } else {
+          row.push('');
+        }
+      });
+      
+      return row;
+    });
+
+    // Create CSV content
+    const csvContent = [headers, ...rows].map(row => 
+      row.map(cell => `"${cell}"`).join(',')
+    ).join('\n');
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `students_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Student data exported successfully!');
   };
 
   const resetForm = () => {
@@ -318,13 +516,25 @@ const StudentTracker: React.FC = () => {
   };
 
   const getPerformanceColor = (percentage: number) => {
-    if (percentage >= 80) return 'text-green-600 bg-green-50 border-green-200';
-    if (percentage >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-red-600 bg-red-50 border-red-200';
+    if (percentage >= 80) return 'text-green-600 bg-green-50 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700/50';
+    if (percentage >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700/50';
+    return 'text-red-600 bg-red-50 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700/50';
+  };
+
+  const getAIInsightBadge = (percentage: number, trend: 'up' | 'down' | 'stable') => {
+    if (percentage >= 90 && trend === 'up') return { text: 'Top Performer', color: 'bg-green-500' };
+    if (percentage < 50 || (percentage < 70 && trend === 'down')) return { text: 'At Risk', color: 'bg-red-500' };
+    if (trend === 'up') return { text: 'Improving', color: 'bg-blue-500' };
+    return null;
+  };
+
+  // Get unique values for filter dropdowns
+  const getUniqueValues = (field: keyof Student) => {
+    return Array.from(new Set(students.map(student => student[field]).filter(Boolean)));
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen bg-white dark:bg-black">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -332,7 +542,7 @@ const StudentTracker: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
@@ -348,15 +558,204 @@ const StudentTracker: React.FC = () => {
             </div>
           </div>
           
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAddModal(true)}
-            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-teal-600 hover:to-cyan-600 transition-all duration-200 flex items-center space-x-2"
+          <div className="flex items-center space-x-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowFilters(!showFilters)}
+              className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 flex items-center space-x-2"
+            >
+              <Filter className="w-4 h-4" />
+              <span>Filters</span>
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={exportToCSV}
+              disabled={filteredStudents.length === 0}
+              className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-medium py-2 px-4 rounded-xl hover:bg-green-200 dark:hover:bg-green-900/50 transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Export</span>
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddModal(true)}
+              className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold py-2 px-4 rounded-xl hover:from-teal-600 hover:to-cyan-600 transition-all duration-200 flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Student</span>
+            </motion.button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Filters Panel */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6 overflow-hidden"
           >
-            <Plus className="w-5 h-5" />
-            <span>Add Student</span>
-          </motion.button>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      value={filters.search}
+                      onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                      placeholder="Search students..."
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grade</label>
+                  <select
+                    value={filters.grade}
+                    onChange={(e) => setFilters(prev => ({ ...prev, grade: e.target.value }))}
+                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">All Grades</option>
+                    {grades.map(grade => (
+                      <option key={grade} value={grade}>{grade}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Class</label>
+                  <select
+                    value={filters.class}
+                    onChange={(e) => setFilters(prev => ({ ...prev, class: e.target.value }))}
+                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">All Classes</option>
+                    {getUniqueValues('class').map(cls => (
+                      <option key={cls} value={cls as string}>{cls}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Section</label>
+                  <select
+                    value={filters.section}
+                    onChange={(e) => setFilters(prev => ({ ...prev, section: e.target.value }))}
+                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">All Sections</option>
+                    {getUniqueValues('section').map(section => (
+                      <option key={section} value={section as string}>{section}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gender</label>
+                  <select
+                    value={filters.gender}
+                    onChange={(e) => setFilters(prev => ({ ...prev, gender: e.target.value }))}
+                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">All Genders</option>
+                    {genders.map(gender => (
+                      <option key={gender} value={gender}>{gender}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+                  <select
+                    value={filters.subject}
+                    onChange={(e) => setFilters(prev => ({ ...prev, subject: e.target.value }))}
+                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">All Subjects</option>
+                    {subjects.map(subject => (
+                      <option key={subject} value={subject}>{subject}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setFilters({ grade: '', class: '', section: '', gender: '', subject: '', search: '' })}
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium"
+                >
+                  Clear All Filters
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Class Statistics */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="mb-8"
+      >
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+            <BarChart3 className="w-5 h-5 text-teal-600 mr-2" />
+            Class Statistics
+            {Object.values(filters).some(f => f) && (
+              <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">(Filtered)</span>
+            )}
+          </h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-xl border border-blue-200/50 dark:border-blue-700/50">
+              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">Total Students</p>
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">{classStats.totalStudents}</p>
+            </div>
+            
+            <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-xl border border-green-200/50 dark:border-green-700/50">
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">Average Score</p>
+              <p className="text-2xl font-bold text-green-700 dark:text-green-300">{classStats.averageScore}%</p>
+            </div>
+            
+            <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-xl border border-purple-200/50 dark:border-purple-700/50">
+              <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">Top Performers</p>
+              <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">{classStats.topPerformers.length}</p>
+            </div>
+            
+            <div className="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-xl border border-orange-200/50 dark:border-orange-700/50">
+              <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">At Risk</p>
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">{classStats.atRiskStudents.length}</p>
+            </div>
+          </div>
+
+          {Object.keys(classStats.subjectAverages).length > 0 && (
+            <div>
+              <h3 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">Subject Averages</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {Object.entries(classStats.subjectAverages).map(([subject, average]) => (
+                  <div key={subject} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{subject}</p>
+                    <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{average}%</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -366,36 +765,56 @@ const StudentTracker: React.FC = () => {
           <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">Loading students...</p>
         </div>
-      ) : students.length === 0 ? (
+      ) : filteredStudents.length === 0 ? (
         <div className="text-center py-12">
           <Users className="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No Students Added</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">Start by adding your first student to track their progress</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAddModal(true)}
-            className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-teal-600 hover:to-cyan-600 transition-all duration-200 flex items-center space-x-2 mx-auto"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Add First Student</span>
-          </motion.button>
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            {students.length === 0 ? 'No Students Added' : 'No Students Match Filters'}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            {students.length === 0 
+              ? 'Start by adding your first student to track their progress'
+              : 'Try adjusting your filters or clear them to see all students'
+            }
+          </p>
+          {students.length === 0 && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddModal(true)}
+              className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-teal-600 hover:to-cyan-600 transition-all duration-200 flex items-center space-x-2 mx-auto"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Add First Student</span>
+            </motion.button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {students.map((student, index) => {
+          {filteredStudents.map((student, index) => {
             const performance = calculateOverallPerformance(student.id);
+            const aiInsight = getAIInsightBadge(performance.percentage, performance.trend);
             
             return (
               <motion.div
                 key={student.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
                 whileHover={{ scale: 1.02, y: -5 }}
                 onClick={() => openDetailModal(student)}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 cursor-pointer hover:shadow-2xl transition-all duration-300"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 cursor-pointer hover:shadow-2xl transition-all duration-300 relative"
               >
+                {/* AI Insight Badge */}
+                {aiInsight && (
+                  <div className={`absolute -top-2 -right-2 ${aiInsight.color} text-white text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1`}>
+                    {aiInsight.text === 'Top Performer' && <Star className="w-3 h-3" />}
+                    {aiInsight.text === 'At Risk' && <AlertTriangle className="w-3 h-3" />}
+                    {aiInsight.text === 'Improving' && <TrendingUp className="w-3 h-3" />}
+                    <span>{aiInsight.text}</span>
+                  </div>
+                )}
+
                 {/* Student Avatar and Basic Info */}
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
@@ -406,6 +825,13 @@ const StudentTracker: React.FC = () => {
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Grade {student.grade} • Roll #{student.rollNumber}
                     </p>
+                    {(student.class || student.section) && (
+                      <p className="text-xs text-gray-500 dark:text-gray-500">
+                        {student.class && `Class ${student.class}`}
+                        {student.class && student.section && ' • '}
+                        {student.section && `Section ${student.section}`}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -916,16 +1342,33 @@ const StudentTracker: React.FC = () => {
                       <div key={subject} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-gray-800 dark:text-gray-200">{subject}</h4>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(avgPercentage)}`}>
-                            {avgPercentage}%
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPerformanceColor(avgPercentage)}`}>
+                              {avgPercentage}%
+                            </span>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleRemoveSubject(selectedStudent.id, subject)}
+                              className="p-1 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-all duration-200"
+                              title="Remove Subject"
+                            >
+                              <X className="w-3 h-3" />
+                            </motion.button>
+                          </div>
                         </div>
                         
                         {subjectMarks.length > 0 ? (
                           <div className="space-y-2">
                             {subjectMarks.slice(0, 3).map(mark => (
                               <div key={mark.id} className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600 dark:text-gray-400">{mark.testName}</span>
+                                <div>
+                                  <span className="text-gray-600 dark:text-gray-400">{mark.testName}</span>
+                                  <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-500">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{new Date(mark.date).toLocaleDateString()}</span>
+                                  </div>
+                                </div>
                                 <div className="flex items-center space-x-2">
                                   <span className="text-gray-800 dark:text-gray-200">{mark.score}/{mark.maxScore}</span>
                                   <span className={`px-2 py-1 rounded text-xs ${getPerformanceColor(mark.percentage)}`}>
@@ -970,8 +1413,9 @@ const StudentTracker: React.FC = () => {
                       <div key={mark.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div>
                           <p className="font-medium text-gray-800 dark:text-gray-200">{mark.subject} - {mark.testName}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {new Date(mark.date).toLocaleDateString()}
+                          <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center space-x-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{new Date(mark.date).toLocaleDateString()}</span>
                           </p>
                         </div>
                         <div className="text-right">
@@ -1015,7 +1459,7 @@ const StudentTracker: React.FC = () => {
                 className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">Select Subject</option>
-                {selectedStudent?.subjects?.map(subject => (
+                {subjects.map(subject => (
                   <option key={subject} value={subject}>{subject}</option>
                 ))}
               </select>
