@@ -146,32 +146,31 @@ const StoryGenerator: React.FC = () => {
   const currentSamplePrompt = samplePrompts[selectedLanguage as keyof typeof samplePrompts] || samplePrompts.en;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
-      <LoadingTeacher 
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:bg-gradient-to-br dark:from-gray-950 via-60%  dark:via-purple-950/10  dark:to-black">
+      {/* <LoadingTeacher 
         isVisible={isGenerating}
         message="Creating your personalized story... Please wait ⏳"
-      />
+      /> */}
       
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 px-6 py-8"
+        className="bg-white/80 dark:bg-transparent backdrop-blur-lg  px-6 py-4 z-0"
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
+        <div className="max-w-7xl mt-14 mx-auto">
+          <div className="flex items-center ">
             <motion.div
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center"
             >
-              <BookOpen className="w-8 h-8 text-white" />
+              <BookOpen className="w-4 h-4 text-gray-900 dark:text-white" />
             </motion.div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold dark:text-zinc-200 text-gray-900">
                 {t('storyTitle')}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-lg mt-2">{t('storySubtitle')}</p>
+              <p className="text-gray-600 dark:text-gray-400 text-xs mt-2">{t('storySubtitle')}</p>
             </div>
           </div>
         </div>
@@ -182,9 +181,6 @@ const StoryGenerator: React.FC = () => {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 min-h-[calc(100vh-200px)]">
           {/* Left Panel - Input Form */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
             className="space-y-6"
           >
             <InputCard title="Story Configuration" icon={Languages}>
@@ -193,10 +189,10 @@ const StoryGenerator: React.FC = () => {
                   <select
                     value={selectedSubject}
                     onChange={(e) => setSelectedSubject(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 text-sm border border-gray-200 dark:border-zinc-800 rounded-xl  bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
                     {subjects.map((subject) => (
-                      <option key={subject.value} value={subject.value}>
+                      <option className='dark:bg-zinc-900' key={subject.value} value={subject.value}>
                         {subject.label}
                       </option>
                     ))}
@@ -207,24 +203,24 @@ const StoryGenerator: React.FC = () => {
                   <select
                     value={selectedGrade}
                     onChange={(e) => setSelectedGrade(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 border text-sm border-gray-200 dark:border-gray-600 rounded-xl  bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
                     {grades.map((grade) => (
-                      <option key={grade.value} value={grade.value}>
+                      <option className='dark:bg-zinc-900' key={grade.value} value={grade.value}>
                         {grade.label}
                       </option>
                     ))}
                   </select>
                 </InputField>
 
-                <InputField label="Output Language" icon={Globe} required>
+                <InputField label="Language" icon={Globe} required>
                   <select
                     value={selectedLanguage}
                     onChange={(e) => setSelectedLanguage(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 text-sm border border-gray-200 dark:border-gray-600 rounded-xl  bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
                     {availableLanguages.slice(0, 6).map((lang) => (
-                      <option key={lang.code} value={lang.code}>
+                      <option className='dark:bg-zinc-900' key={lang.code} value={lang.code}>
                         {lang.nativeName}
                       </option>
                     ))}
@@ -242,7 +238,7 @@ const StoryGenerator: React.FC = () => {
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder={t('enterPrompt')}
-                    className="w-full h-32 p-4 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full h-32 p-4 border border-gray-200 dark:border-gray-600 rounded-xl text-sm resize-none bg-white/50 dark:bg-transparent  text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   />
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -289,7 +285,7 @@ const StoryGenerator: React.FC = () => {
           >
             {generatedStory ? (
               <OutputCard
-                title={`Story: ${prompt.substring(0, 50)}...`}
+                title={`Story: ${prompt.substring(0, 20)}...`}
                 content={generatedStory}
                 type="story"
                 onSave={handleSave}
@@ -300,7 +296,7 @@ const StoryGenerator: React.FC = () => {
                 className="h-full"
               />
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8 h-full flex items-center justify-center">
+              <div className="bg-white dark:bg-transparent rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8 h-full flex items-center justify-center">
                 <div className="text-center">
                   <motion.div
                     animate={{ 
@@ -312,9 +308,9 @@ const StoryGenerator: React.FC = () => {
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                    className="w-20 h-20 border border-gray-300 dark:border-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-6"
                   >
-                    <BookOpen className="w-12 h-12 text-purple-500 dark:text-purple-400" />
+                    <BookOpen className="w-10 h-10 text-purple-500 dark:text-purple-400" />
                   </motion.div>
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Ready to Create Stories</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">Your AI-generated story will appear here</p>
