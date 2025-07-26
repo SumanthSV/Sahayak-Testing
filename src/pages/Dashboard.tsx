@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { 
   BookOpen, 
   FileText, 
   Users, 
   Calendar,
-  Play,
+ 
   Download,
   Eye,
   Trash2,
@@ -15,7 +15,6 @@ import {
   VolumeX,
   ImageIcon
 } from 'lucide-react'; 
-import { Image } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { FirebaseService, GeneratedContent, GeneratedImage, UserData } from '../services/firebaseService';
 import { Modal } from '../components/UI/Modal';
@@ -24,7 +23,7 @@ import toast from 'react-hot-toast';
 import '../index.css'
 
 const Dashboard: React.FC = () => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation();
   const { user } = useAuth();
   const [savedContent, setSavedContent] = useState<GeneratedContent[]>([]);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
@@ -179,7 +178,8 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen bg-white dark:bg-black">
+    <div  className="p-4  md:p-6 max-w-7xl mx-auto min-h-screen  dark:bg-gradient-to-br dark:from-gray-950 via-60%  dark:via-purple-950/10  dark:to-black">
+    <div className="mt-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -195,23 +195,24 @@ const Dashboard: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
         {stats.map((stat, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="bg-white/80 dark:bg-black backdrop-blur-lg border border-gray-200/50 dark:border-zinc-800 rounded-2xl p-4 md:p-6 shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center`}>
-                <stat.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-              </div>
-            </div>
-            <div>
-              <p className="text-gray-700 dark:text-gray-300 text-xs md:text-sm font-medium">{stat.title}</p>
-              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">{stat.value}</p>
-            </div>
-          </motion.div>
+         <motion.div
+  key={index}
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: index * 0.1 }}
+  className="bg-white/10 dark:bg-transparent backdrop-blur-[8px] border border-white/10 dark:border-white/10 rounded-2xl p-4 md:p-6 shadow-[0_4px_30px_rgba(0,0,0,0.3)] hover:shadow-[0_6px_40px_rgba(0,0,0,0.4)] transition-all duration-300"
+>
+  <div className="flex items-center justify-between mb-2">
+    <div className={`w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center`}>
+      <stat.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+    </div>
+  </div>
+  <div>
+    <p className="dark:text-white/80 text-zinc-800 text-xs md:text-sm font-medium">{stat.title}</p>
+    <p className="text-2xl md:text-3xl font-bold dark:text-white text-zinc-800 mt-1">{stat.value}</p>
+  </div>
+</motion.div>
+
         ))}
       </div>
 
@@ -220,11 +221,11 @@ const Dashboard: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="bg-white/80 dark:bg-black backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-4 md:p-6"
+        className="bg-white/80 dark:bg-transparent backdrop-blur-[8px] border border-white/10 dark:border-white/10 rounded-2xl shadow-xl  p-4 md:p-6"
       >
         {/* Tab Navigation */}
         <div className="flex items-center bg-mainBackground justify-between mb-6">
-          <div className="flex space-x-1 bg-gray-100 dark:bg-zinc-900 rounded-xl p-1">
+          <div className="flex space-x-1 bg-gray-100 dark:bg-white/5 backdrop-blur-[8px] border border-white/10 dark:border-white/10 rounded-xl p-1">
             {[
               { key: 'content', label: 'Content', count: savedContent.length },
               { key: 'images', label: 'Images', count: generatedImages.length },
@@ -236,7 +237,7 @@ const Dashboard: React.FC = () => {
                 onClick={() => setActiveTab(tab.key as any)}
                 className={`px-4 py-2  rounded-lg text-sm font-medium transition-all duration-200 ${
                   activeTab === tab.key
-                    ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 shadow-sm'
+                    ? 'bg-white dark:bg-transparent backdrop-blur-[8px] text-gray-900 dark:text-gray-100 shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                 }`}
               >
@@ -361,7 +362,7 @@ const Dashboard: React.FC = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
                       whileHover={{ scale: 1.02 }}
-                      className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-200/50 dark:border-gray-600/50 hover:shadow-md transition-all duration-200"
+                      className="bg-white/50 dark:bg-gray-700/50 backdrop-blur-xl rounded-xl overflow-hidden border border-gray-200/50 dark:border-gray-600/50 hover:shadow-md transition-all duration-200"
                     >
                       <div className="aspect-square relative">
                         <img
@@ -614,6 +615,7 @@ const Dashboard: React.FC = () => {
           </div>
         )}
       </Modal>
+    </div>
     </div>
   );
 };
