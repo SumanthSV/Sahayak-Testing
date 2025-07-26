@@ -3,31 +3,31 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
-import { useResponsiveBreakpoints } from './hooks/useResponsiveBreakpoints';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { LoadingSpinner } from './components/UI/LoadingSpinner';
 import { OfflineIndicator } from './components/UI/OfflineIndicator';
 import { VoiceButton } from './components/UI/VoiceButton';
 
 // Lazy load components for better performance
-const FuturisticLoginForm = React.lazy(() => import('./components/Auth/FuturisticLoginForm'));
-const FuturisticSignupForm = React.lazy(() => import('./components/Auth/FuturisticSignupForm'));
-const ModernLayout = React.lazy(() => import('./components/Layout/ModernLayout'));
+const LoginForm = React.lazy(() => import('./components/Auth/LoginForm'));
+const SignupForm = React.lazy(() => import('./components/Auth/SignupForm'));
+const Layout = React.lazy(() => import('./components/Layout/Layout'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const StoryGenerator = React.lazy(() => import('./pages/StoryGenerator'));
-const ModernWorksheetGenerator = React.lazy(() => import('./pages/ModernWorksheetGenerator'));
+const WorksheetGenerator = React.lazy(() => import('./pages/WorksheetGenerator'));
 const ConceptExplainer = React.lazy(() => import('./pages/ConceptExplainer'));
 const VisualAids = React.lazy(() => import('./pages/VisualAids'));
 const VoiceAssessment = React.lazy(() => import('./pages/VoiceAssessment'));
 const LessonPlanner = React.lazy(() => import('./pages/LessonPlanner'));
 const StudentTracker = React.lazy(() => import('./pages/StudentTracker'));
-const MagicalGames = React.lazy(() => import('./pages/MagicalGames'));
+const Games = React.lazy(() => import('./pages/Games'));
 const Settings = React.lazy(() => import('./pages/Settings'));
+const Home = React.lazy(() => import('./pages/Home'));
+import Navbar from './components/HomePageComponents/Navbar'
 
 function App() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const isOnline = useOnlineStatus();
-  const { isMobile, isTablet, isDesktop } = useResponsiveBreakpoints();
   const [showSignup, setShowSignup] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
 
@@ -51,19 +51,6 @@ function App() {
   }, []);
 
   // Add responsive classes to body
-  useEffect(() => {
-    const bodyClasses = ['responsive-app'];
-    
-    if (isMobile) bodyClasses.push('mobile-view');
-    if (isTablet) bodyClasses.push('tablet-view');
-    if (isDesktop) bodyClasses.push('desktop-view');
-    
-    document.body.className = bodyClasses.join(' ');
-    
-    return () => {
-      document.body.className = '';
-    };
-  }, [isMobile, isTablet, isDesktop]);
 
   // if (loading) {
   //   return <LoadingSpinner />;
@@ -71,59 +58,52 @@ function App() {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        {/* Skip Link for Accessibility
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a> */}
-
-        {/* Offline Indicator */}
+      <div className="min-h-screen ">
         <OfflineIndicator isOnline={isOnline} />
         
         <AnimatePresence mode="wait">
           <Suspense fallback={<LoadingSpinner />}>
+
+          
             {!user ? (
               <Routes>
-                <Route path="/signup" element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="container-responsive"
-                  >
-                    <FuturisticSignupForm onBackToLogin={() => setShowSignup(false)} />
-                  </motion.div>
+                <Route path="/" element={
+                    <Home />
                 } />
-                <Route path="/*" element={
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
+                <Route path="/signup" element={
+                  <div
                     className="container-responsive"
                   >
+                    <SignupForm onBackToLogin={() => setShowSignup(false)} />
+                  </div>
+                } />
+                <Route path="/login" element=
                     {showSignup ? (
-                      <FuturisticSignupForm onBackToLogin={() => setShowSignup(false)} />
+                      <>
+                      <Navbar/>
+                      <SignupForm onBackToLogin={() => setShowSignup(false)} />
+                        </>
                     ) : (
-                      <FuturisticLoginForm onShowSignup={() => setShowSignup(true)} />
-                    )}
-                  </motion.div>
+                      <>
+                      <Navbar/>
+                      <LoginForm onShowSignup={() => setShowSignup(true)} />
+                        </>
+                    )
                 } />
               </Routes>
             ) : (
               <Routes>
-                <Route path="/" element={<ModernLayout />}>
-                  <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Dashboard />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="stories" element={<StoryGenerator />} />
-                  <Route path="worksheets" element={<ModernWorksheetGenerator />} />
+                  <Route path="worksheets" element={<WorksheetGenerator />} />
                   <Route path="concepts" element={<ConceptExplainer />} />
                   <Route path="visuals" element={<VisualAids />} />
                   <Route path="assessment" element={<VoiceAssessment />} />
                   <Route path="planner" element={<LessonPlanner />} />
                   <Route path="tracking" element={<StudentTracker />} />
-                  <Route path="games" element={<MagicalGames />} />
+                  <Route path="games" element={<Games />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -136,7 +116,6 @@ function App() {
         {user && (
           <VoiceButton 
             position="fixed"
-            size={isMobile ? 'md' : 'lg'}
             isRecording={isVoiceActive}
             onStartRecording={() => setIsVoiceActive(true)}
             onStopRecording={() => setIsVoiceActive(false)}
