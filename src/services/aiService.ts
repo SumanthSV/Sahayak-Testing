@@ -386,4 +386,4 @@ export class AIService {
       throw new Error('Failed to translate content. Please check your connection and try again.');
     }
   }
-}
+}x
