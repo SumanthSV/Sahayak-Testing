@@ -206,6 +206,7 @@ const LessonPlanner: React.FC = () => {
     setIsGeneratingImprovements(true);
     try {
       const result = await AIService.generateLessonImprovements(planData);
+      console.log(result);
       setImprovements(result);
       setShowImprovements(true);
       toast.success('AI improvements generated!');
@@ -310,26 +311,26 @@ const LessonPlanner: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white dark:bg-black">
+    <div className="p-6 max-w-7xl mx-auto dark:bg-gradient-to-br dark:from-gray-950 via-60%  dark:via-purple-950/10  dark:to-black">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="mb-6"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex mt-14 items-center justify-between">
           <div className="flex items-center space-x-3">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
               className="w-12 h-12  rounded-xl flex items-center justify-center"
             >
-              <Calendar className="w-6 h-6 text-black dark:text-white" />
+              <Calendar className="w-5 h-5 text-black dark:text-white" />
             </motion.div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-200">
                 Multi-Grade Lesson Planner
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">Plan and organize lessons for multiple grade levels</p>
+              <p className="text-gray-600 text-sm dark:text-gray-400">Plan and organize lessons for multiple grade levels</p>
             </div>
           </div>
           <motion.button
@@ -349,7 +350,7 @@ const LessonPlanner: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="bg-white/80 dark:bg-zinc-950 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 mb-6"
+        className="bg-white/80 dark:bg-transparent backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 mb-6"
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Weekly Overview</h2>
@@ -358,7 +359,7 @@ const LessonPlanner: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedWeek(addDays(selectedWeek, -7))}
-              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-zinc-950 transition-all duration-200"
+              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-transparent transition-all duration-200"
             >
               ←
             </motion.button>
@@ -395,7 +396,7 @@ const LessonPlanner: React.FC = () => {
                     key={planIndex}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => startEditing(plan)}
-                    className="bg-white dark:bg-gray-600 p-2 rounded-lg border-l-4 border-indigo-500 cursor-pointer hover:shadow-md transition-all duration-200"
+                    className="bg-white dark:bg-transparent p-2 rounded-lg border-l-4 border-indigo-500 cursor-pointer hover:shadow-md transition-all duration-200"
                   >
                     <p className="text-xs font-medium text-indigo-600">{plan.subject}</p>
                     <p className="text-sm text-gray-800 dark:text-gray-200 truncate">{plan.title}</p>
@@ -419,7 +420,7 @@ const LessonPlanner: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white/80 dark:bg-zinc-950 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 mb-6"
+          className="bg-white/80 dark:bg-transparent backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 mb-6"
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
@@ -444,7 +445,7 @@ const LessonPlanner: React.FC = () => {
                   value={formData.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
                   placeholder="Enter lesson title..."
-                  className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                  className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                 />
               </div>
 
@@ -456,10 +457,10 @@ const LessonPlanner: React.FC = () => {
                   <select
                     value={formData.subject}
                     onChange={(e) => handleInputChange('subject', e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm  bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                   >
                     {subjects.map((subject) => (
-                      <option key={subject.value} value={subject.value}>
+                     <option className="dark:bg-zinc-900"key={subject.value} value={subject.value}>
                         {subject.label}
                       </option>
                     ))}
@@ -473,10 +474,10 @@ const LessonPlanner: React.FC = () => {
                   <select
                     value={formData.grade}
                     onChange={(e) => handleInputChange('grade', e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                   >
                     {grades.map((grade) => (
-                      <option key={grade.value} value={grade.value}>
+                     <option className="dark:bg-zinc-900"key={grade.value} value={grade.value}>
                         {grade.label}
                       </option>
                     ))}
@@ -493,7 +494,7 @@ const LessonPlanner: React.FC = () => {
                     type="number"
                     value={formData.duration}
                     onChange={(e) => handleInputChange('duration', e.target.value)}
-                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                    className="w-full p-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm  bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                   />
                 </div>
 
@@ -504,11 +505,11 @@ const LessonPlanner: React.FC = () => {
                   <select
                     value={formData.difficulty}
                     onChange={(e) => handleInputChange('difficulty', e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                   >
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
+                   <option className="dark:bg-zinc-900"value="easy">Easy</option>
+                   <option className="dark:bg-zinc-900"value="medium">Medium</option>
+                   <option className="dark:bg-zinc-900"value="hard">Hard</option>
                   </select>
                 </div>
 
@@ -519,11 +520,11 @@ const LessonPlanner: React.FC = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => handleInputChange('status', e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm  bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                   >
-                    <option value="draft">Draft</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
+                   <option className="dark:bg-zinc-900"value="draft">Draft</option>
+                   <option className="dark:bg-zinc-900"value="active">Active</option>
+                   <option className="dark:bg-zinc-900"value="completed">Completed</option>
                   </select>
                 </div>
               </div>
@@ -536,7 +537,7 @@ const LessonPlanner: React.FC = () => {
                   type="text"
                   value={formData.week}
                   readOnly
-                  className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                  className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-transparent text-gray-900 dark:text-gray-100"
                 />
               </div>
 
@@ -551,7 +552,7 @@ const LessonPlanner: React.FC = () => {
                       value={objective}
                       onChange={(e) => handleArrayChange('objectives', index, e.target.value)}
                       placeholder="Enter learning objective..."
-                      className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                      className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm  bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                     />
                     {formData.objectives.length > 1 && (
                       <motion.button
@@ -586,7 +587,7 @@ const LessonPlanner: React.FC = () => {
                       value={activity}
                       onChange={(e) => handleArrayChange('activities', index, e.target.value)}
                       placeholder="Enter activity..."
-                      className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                      className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                     />
                     {formData.activities.length > 1 && (
                       <motion.button
@@ -619,7 +620,7 @@ const LessonPlanner: React.FC = () => {
                       value={resource}
                       onChange={(e) => handleArrayChange('resources', index, e.target.value)}
                       placeholder="Enter resource..."
-                      className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-xl  bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                      className="flex-1 p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                     />
                     {formData.resources.length > 1 && (
                       <motion.button
@@ -649,7 +650,7 @@ const LessonPlanner: React.FC = () => {
                   value={formData.assessment}
                   onChange={(e) => handleInputChange('assessment', e.target.value)}
                   placeholder="How will you assess student learning?"
-                  className="w-full h-24 p-3 border border-gray-200 dark:border-gray-600 rounded-xl  resize-none bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100"
+                  className="w-full h-24 p-3 border border-gray-200 dark:border-gray-600 rounded-xl text-sm resize-none bg-white dark:bg-transparent text-gray-900 dark:text-gray-100"
                 />
               </div>
 
@@ -658,7 +659,7 @@ const LessonPlanner: React.FC = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSave}
                 disabled={!formData.title.trim() || isSaving}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold py-3 px-6 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center space-x-2"
+                className="w-full dark:text-white border border-zinc-500 font-semibold py-3 px-6 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 flex items-center justify-center space-x-2"
               >
                 {isSaving ? (
                   <>
@@ -673,7 +674,7 @@ const LessonPlanner: React.FC = () => {
                 )}
               </motion.button>
               
-              {!editingPlan && formData.title.trim() && (
+              {!editingPlan && formData.title.trim() && formData.objectives[0].trim() && formData.activities[0].trim() && (
                 <div className="grid grid-cols-2 gap-3 mt-3">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -686,7 +687,7 @@ const LessonPlanner: React.FC = () => {
                       activities: formData.activities.filter(act => act.trim())
                     })}
                     disabled={isGeneratingSuggestions}
-                    className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-3 px-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center justify-center space-x-2"
+                    className="dark:text-white border border-zinc-500 font-semibold py-3 px-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-green-600 hover:to-emerald-600 transition-all duration-200 flex items-center justify-center space-x-2"
                   >
                     {isGeneratingSuggestions ? (
                       <>
@@ -706,7 +707,7 @@ const LessonPlanner: React.FC = () => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => generateImprovements(formData)}
                     disabled={isGeneratingImprovements}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-600 hover:to-pink-600 transition-all duration-200 flex items-center justify-center space-x-2"
+                    className="dark:text-white border border-zinc-500 font-semibold py-3 px-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-600 hover:to-pink-600 transition-all duration-200 flex items-center justify-center space-x-2"
                   >
                     {isGeneratingImprovements ? (
                       <>
@@ -733,7 +734,7 @@ const LessonPlanner: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+            className="bg-white dark:bg-transparent rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
@@ -839,7 +840,7 @@ const LessonPlanner: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+            className="bg-white dark:bg-transparent rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
           >
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
@@ -864,40 +865,40 @@ const LessonPlanner: React.FC = () => {
                     <p className="text-blue-700 dark:text-blue-300 text-sm">{improvements.overallFeedback}</p>
                   </div>
 
-                  {/* Strengths */}
+                  {/* Improvements */}
                   <div className="bg-green-50 dark:bg-green-900/30 rounded-xl p-4 border border-green-200 dark:border-green-700/50">
                     <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">Strengths Identified</h3>
                     <ul className="space-y-1">
-                      {improvements.strengthsIdentified.map((strength: string, index: number) => (
+                      {improvements.improvements.map((improvement: string, index: number) => (
                         <li key={index} className="text-green-700 dark:text-green-300 text-sm flex items-start">
                           <span className="text-green-500 dark:text-green-400 mr-2">✓</span>
-                          {strength}
+                          {improvement}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Areas for Improvement */}
+                  {/* resources */}
                   <div className="bg-orange-50 dark:bg-orange-900/30 rounded-xl p-4 border border-orange-200 dark:border-orange-700/50">
                     <h3 className="font-semibold text-orange-800 dark:text-orange-300 mb-2">Areas for Improvement</h3>
                     <ul className="space-y-1">
-                      {improvements.areasForImprovement.map((area: string, index: number) => (
+                      {improvements.resources.map((resource: string, index: number) => (
                         <li key={index} className="text-orange-700 dark:text-orange-300 text-sm flex items-start">
                           <span className="text-orange-500 dark:text-orange-400 mr-2">•</span>
-                          {area}
+                          {resource}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Enhanced Objectives */}
+                  {/* assessmentIdeas */}
                   <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-700/50">
                     <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">Enhanced Objectives</h3>
                     <ul className="space-y-1">
-                      {improvements.enhancedObjectives.map((objective: string, index: number) => (
+                      {improvements.assessmentIdeas.map((assessmentIdea: string, index: number) => (
                         <li key={index} className="text-purple-700 dark:text-purple-300 text-sm flex items-start">
                           <span className="text-purple-500 dark:text-purple-400 mr-2">→</span>
-                          {objective}
+                          {assessmentIdea}
                         </li>
                       ))}
                     </ul>
@@ -919,7 +920,7 @@ const LessonPlanner: React.FC = () => {
 
                 {/* Right Column */}
                 <div className="space-y-4">
-                  {/* Recommended Resources */}
+                  {/* Recommended Resources  */}
                   <div className="bg-teal-50 dark:bg-teal-900/30 rounded-xl p-4 border border-teal-200 dark:border-teal-700/50">
                     <h3 className="font-semibold text-teal-800 dark:text-teal-300 mb-2">Recommended Resources</h3>
                     <ul className="space-y-1">
@@ -962,7 +963,7 @@ const LessonPlanner: React.FC = () => {
                   <div className="bg-cyan-50 dark:bg-cyan-900/30 rounded-xl p-4 border border-cyan-200 dark:border-cyan-700/50">
                     <h3 className="font-semibold text-cyan-800 dark:text-cyan-300 mb-2">Differentiation Strategies</h3>
                     <ul className="space-y-1">
-                      {improvements.differentiationStrategies.map((strategy: string, index: number) => (
+                      {improvements.enhancedObjectives.map((strategy: string, index: number) => (
                         <li key={index} className="text-cyan-700 dark:text-cyan-300 text-sm flex items-start">
                           <span className="text-cyan-500 dark:text-cyan-400 mr-2">🎯</span>
                           {strategy}
@@ -997,7 +998,8 @@ const LessonPlanner: React.FC = () => {
                       ...prev,
                       objectives: [...prev.objectives, ...improvements.enhancedObjectives.slice(0, 2)],
                       activities: [...prev.activities, ...improvements.additionalActivities.slice(0, 2)],
-                      resources: [...prev.resources, ...improvements.recommendedResources.slice(0, 2)]
+                      resources: [...prev.resources, ...improvements.recommendedResources.slice(0, 2)],
+                      // assessment: [...prev.assessment, ...improvements.assessmentEnhancements.slice(0, 2)]
                     }));
                     setShowImprovements(false);
                     toast.success('Improvements applied to lesson plan!');
@@ -1025,7 +1027,7 @@ const LessonPlanner: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
-        className="bg-white/80 dark:bg-zinc-950 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6"
+        className="bg-white/80 dark:bg-transparent backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6"
       >
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-6">All Lesson Plans</h2>
         
@@ -1049,7 +1051,7 @@ const LessonPlanner: React.FC = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
                 whileHover={{ scale: 1.02 }}
-                className="border border-gray-200 dark:border-gray-600 rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm"
+                className="border border-gray-200 dark:border-gray-600 rounded-xl p-4 hover:shadow-md transition-all duration-200 cursor-pointer bg-white/50 dark:bg-transparent backdrop-blur-sm"
                 onClick={() => startEditing(plan)}
               >
                 <div className="flex items-start justify-between mb-3">
