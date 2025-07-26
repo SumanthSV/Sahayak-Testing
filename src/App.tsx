@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { TaskProvider } from './contexts/TaskContext';
 import { LoadingSpinner } from './components/UI/LoadingSpinner';
 import { OfflineIndicator } from './components/UI/OfflineIndicator';
 import { VoiceButton } from './components/UI/VoiceButton';
@@ -22,6 +23,7 @@ const LessonPlanner = React.lazy(() => import('./pages/LessonPlanner'));
 const StudentTracker = React.lazy(() => import('./pages/StudentTracker'));
 const Games = React.lazy(() => import('./pages/Games'));
 const Settings = React.lazy(() => import('./pages/Settings'));
+const GeneratePage = React.lazy(() => import('./pages/GeneratePage'));
 const Home = React.lazy(() => import('./pages/Home'));
 import Navbar from './components/HomePageComponents/Navbar'
 
@@ -58,6 +60,7 @@ function App() {
 
   return (
     <LanguageProvider>
+      <TaskProvider>
       <div className="min-h-screen ">
         <OfflineIndicator isOnline={isOnline} />
         
@@ -105,6 +108,7 @@ function App() {
                   <Route path="tracking" element={<StudentTracker />} />
                   <Route path="games" element={<Games />} />
                   <Route path="settings" element={<Settings />} />
+                  <Route path="generate" element={<GeneratePage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
@@ -122,6 +126,7 @@ function App() {
           />
         )}
       </div>
+      </TaskProvider>
     </LanguageProvider>
   );
 }

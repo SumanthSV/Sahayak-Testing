@@ -16,7 +16,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Zap
 } from 'lucide-react';
 import { FirebaseService } from '../../services/firebaseService';
 import toast from 'react-hot-toast';
@@ -41,6 +42,7 @@ const ResponsiveSidebar: React.FC<ResponsiveSidebarProps> = ({ isMobile }) => {
     { id: 'planner', icon: Calendar, label: t('lessonPlanner'), path: '/planner', color: 'text-indigo-600 dark:text-indigo-400' },
     { id: 'tracking', icon: Users, label: t('studentTracker'), path: '/tracking', color: 'text-teal-600 dark:text-teal-400' },
     { id: 'games', icon: Gamepad2, label: 'Educational Games', path: '/games', color: 'text-purple-600 dark:text-purple-400' },
+    { id: 'generate', icon: Zap, label: 'Background Tasks', path: '/generate', color: 'text-indigo-600 dark:text-indigo-400' },
   ];
 
   useEffect(() => {

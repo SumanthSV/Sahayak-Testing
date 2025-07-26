@@ -17,6 +17,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../hooks/useAuth';
 import { FirebaseService } from '../../services/firebaseService';
 import { AccessibilityControls } from '../UI/AccessibilityControls';
+import { TaskStatusBadge } from '../UI/TaskStatusBadge';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -108,6 +109,12 @@ const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Task Status Badge */}
+            <TaskStatusBadge 
+              onClick={() => navigate('/generate')}
+              className="hidden sm:inline-flex"
+            />
+            
             {/* Language Selector */}
             <div className="relative">
               <motion.button
