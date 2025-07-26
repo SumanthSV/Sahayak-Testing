@@ -7,8 +7,8 @@ import {
   BookOpen,
   GraduationCap,
   Globe,
-  Palette,
-  Save
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { AIService } from '../services/aiService';
 import { FirebaseService } from '../services/firebaseService';
@@ -18,6 +18,8 @@ import { LoadingTeacher } from '../components/UI/LoadingTeacher';
 import { OutputCard } from '../components/UI/OutputCard';
 import { InputCard, InputField } from '../components/UI/InputCard';
 import { GenerateButton } from '../components/UI/GenerateButton';
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+
 import toast from 'react-hot-toast';
 
 const VisualAids: React.FC = () => {
@@ -33,6 +35,8 @@ const VisualAids: React.FC = () => {
   const [generatedAid, setGeneratedAid] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+    const { isListening, transcript, startListening, stopListening } = useSpeechRecognition();
+  
 
   const subjects = [
     { value: 'science', label: t('science') },
@@ -60,6 +64,12 @@ const VisualAids: React.FC = () => {
     kn: 'ನೀರಿನ ಚಕ್ರ'
   };
 
+  React.useEffect(() => {
+    if (transcript) {
+      setTopic(transcript);
+    }
+  }, [transcript]);
+
   const handleGenerate = async () => {
     if (!topic.trim()) {
       toast.error('Please enter a topic');
@@ -84,6 +94,14 @@ const VisualAids: React.FC = () => {
       toast.error('Failed to generate visual aid. Please try again.');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleVoiceInput = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening(language);
     }
   };
 
@@ -124,7 +142,7 @@ const VisualAids: React.FC = () => {
   const currentSampleTopic = sampleTopic[language as keyof typeof sampleTopic] || sampleTopic.en;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen dark:bg-gradient-to-br dark:from-gray-950 via-60%  dark:via-purple-950/10  dark:to-black">
       <LoadingTeacher 
         isVisible={isGenerating}
         message="Creating visual aid instructions... Please wait ⏳"
@@ -135,21 +153,21 @@ const VisualAids: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 px-6 py-8"
+        className="bg-white/80 dark:bg-transparent backdrop-blur-lg  px-6 py-3"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mt-14 mx-auto">
           <div className="flex items-center space-x-4">
             <motion.div
               whileHover={{ scale: 1.05, rotate: 5 }}
-              className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center"
+              className=" rounded-2xl flex items-center justify-center"
             >
               <Image className="w-6 h-6 text-white" />
             </motion.div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-200">
                 Visual Aid Generator
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-lg mt-2">Create engaging visual aids with step-by-step instructions</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">Create engaging visual aids with step-by-step instructions</p>
             </div>
           </div>
         </div>
@@ -171,10 +189,10 @@ const VisualAids: React.FC = () => {
                   <select
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 border border-gray-200 text-sm dark:border-gray-600 rounded-xl bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
                     {subjects.map((sub) => (
-                      <option key={sub.value} value={sub.value}>
+                      <option className="bg-zinc-900"key={sub.value} value={sub.value}>
                         {sub.label}
                       </option>
                     ))}
@@ -185,10 +203,10 @@ const VisualAids: React.FC = () => {
                   <select
                     value={grade}
                     onChange={(e) => setGrade(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 border border-gray-200  text-sm dark:border-gray-600 rounded-xl bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
                     {grades.map((gr) => (
-                      <option key={gr.value} value={gr.value}>
+                      <option className="bg-zinc-900"key={gr.value} value={gr.value}>
                         {gr.label}
                       </option>
                     ))}
@@ -201,14 +219,14 @@ const VisualAids: React.FC = () => {
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 border border-gray-200  text-sm dark:border-gray-600 rounded-xl bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी</option>
-                    <option value="kn">ಕನ್ನಡ</option>
-                    <option value="mr">मराठी</option>
-                    <option value="ta">தமிழ்</option>
-                    <option value="bn">বাংলা</option>
+                    <option className="bg-zinc-900"value="en">English</option>
+                    <option className="bg-zinc-900"value="hi">हिंदी</option>
+                    <option className="bg-zinc-900"value="kn">ಕನ್ನಡ</option>
+                    <option className="bg-zinc-900"value="mr">मराठी</option>
+                    <option className="bg-zinc-900"value="ta">தமிழ்</option>
+                    <option className="bg-zinc-900"value="bn">বাংলা</option>
                   </select>
                 </InputField>
 
@@ -216,10 +234,10 @@ const VisualAids: React.FC = () => {
                   <select
                     value={imageType}
                     onChange={(e) => setImageType(e.target.value)}
-                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                    className="w-full p-3 border border-gray-200  text-sm dark:border-gray-600 rounded-xl bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                   >
-                    <option value="3D Visuals">3D Visuals</option>
-                    <option value="Drawable Visuals">Drawable Visuals</option>
+                    <option className="bg-zinc-900"value="3D Visuals">3D Visuals</option>
+                    <option className="bg-zinc-900"value="Drawable Visuals">Drawable Visuals</option>
                   </select>
                 </InputField>
               </div>
@@ -234,8 +252,20 @@ const VisualAids: React.FC = () => {
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="Enter the topic you want to create a visual aid for..."
-                  className="w-full p-4 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white/50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                  className="w-full p-4 border  text-sm border-gray-200 dark:border-gray-600 rounded-xl bg-white/50 dark:bg-transparent text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                 />
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleVoiceInput}
+                    className={`absolute right-8 p-2 rounded-lg transition-all duration-200 ${
+                      isListening
+                        ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 animate-pulse'
+                        : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-500'
+                    }`}
+                  >
+                    {isListening ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
+                  </motion.button>
               </InputField>
               
               <InputField label="Popular Topic">
@@ -268,11 +298,11 @@ const VisualAids: React.FC = () => {
           >
             {generatedAid ? (
               <OutputCard
-                title={`Visual Aid: ${topic}`}
+                title={`Visual Aid: ${topic.substring(0, 20)}`}
                 content={generatedAid.instructions}
                 tips={generatedAid.teachingTips?.join('\n')}
                 suggestions={generatedAid.variations?.join('\n')}
-                imageUrl={generatedAid.imageUrl ? `data:image/png;base64,${generatedAid.imageUrl}` : undefined}
+                imageBase64={generatedAid.imageBase64 ? `data:image/png;base64,${generatedAid.imageBase64}` : undefined}
                 type="visual-aid"
                 onSave={handleSave}
                 onRegenerate={handleRegenerate}
@@ -281,7 +311,7 @@ const VisualAids: React.FC = () => {
                 className="h-full"
               />
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8 h-full flex items-center justify-center">
+              <div className="bg-white dark:bg-transparent rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8 h-full flex items-center justify-center">
                 <div className="text-center">
                   <motion.div
                     animate={{ 
@@ -293,9 +323,9 @@ const VisualAids: React.FC = () => {
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="w-24 h-24 bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                    className="w-14 h-14 border border-zinc-800 dark:border-zinc-700  rounded-2xl flex items-center justify-center mx-auto mb-6"
                   >
-                    <Image className="w-12 h-12 text-orange-500 dark:text-orange-400" />
+                    <Image className="w-8 h-8 text-orange-500 dark:text-orange-400" />
                   </motion.div>
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Ready to Create Visual Aids</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">Your visual aid guide will appear here</p>
