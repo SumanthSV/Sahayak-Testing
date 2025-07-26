@@ -153,7 +153,7 @@ export class FirebaseService {
   static async signUp(email: string, password: string, teacherData: Partial<Teacher>): Promise<User> {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
-    
+    console.log(result);
     await updateProfile(result.user, {
       displayName: teacherData.name 
     });
@@ -242,12 +242,15 @@ export class FirebaseService {
     const autoSaveEnabled = settings.autoSaveContent;
     
     try {
-      const docRef = await addDoc(collection(db, 'generated_content'), {
+      const docRef = await addDoc(
+      collection(db, 'users', user.uid, 'generated_content'),
+      {
         ...content,
         createdAt: serverTimestamp(),
         tags: content.tags || [],
         metadata: content.metadata || {}
-      });
+      }
+    );
       
       // If auto-save is enabled, also save to user-scoped local storage
       if (autoSaveEnabled) {
@@ -282,46 +285,47 @@ export class FirebaseService {
   }
 
   static async getGeneratedContent(teacherId: string, type?: string): Promise<GeneratedContent[]> {
-    try {
-      let q = query(
-        collection(db, 'generated_content'),
-        where('teacherId', '==', teacherId),
+  try {
+    // Path: users/{teacherId}/generated_content
+    const baseCollection = collection(db, 'users', teacherId, 'generated_content');
+
+    let q = query(
+      baseCollection,
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+
+    if (type) {
+      q = query(
+        baseCollection,
+        where('type', '==', type),
         orderBy('createdAt', 'desc'),
         limit(50)
       );
-
-      if (type) {
-        q = query(
-          collection(db, 'generated_content'),
-          where('teacherId', '==', teacherId),
-          where('type', '==', type),
-          orderBy('createdAt', 'desc'),
-          limit(50)
-        );
-      }
-
-      const snapshot = await getDocs(q);
-      const content = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: data.createdAt?.toDate() || new Date()
-        } as GeneratedContent;
-      });
-
-      // Merge with user-scoped offline content
-      const offlineContent = this.getFromUserLocalStorage(teacherId, 'offline_content') || [];
-      const autoSavedContent = this.getFromUserLocalStorage(teacherId, 'auto_saved_content') || [];
-      return [...content, ...offlineContent, ...autoSavedContent];
-    } catch (error) {
-      console.error('Error fetching content:', error);
-      // Return user-scoped offline content if network unavailable
-      const offlineContent = this.getFromUserLocalStorage(teacherId, 'offline_content') || [];
-      const autoSavedContent = this.getFromUserLocalStorage(teacherId, 'auto_saved_content') || [];
-      return [...offlineContent, ...autoSavedContent];
     }
+
+    const snapshot = await getDocs(q);
+    const content = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date()
+      } as GeneratedContent;
+    });
+
+    // Merge with user-scoped offline content
+    const offlineContent = this.getFromUserLocalStorage(teacherId, 'offline_content') || [];
+    const autoSavedContent = this.getFromUserLocalStorage(teacherId, 'auto_saved_content') || [];
+    return [...content, ...offlineContent, ...autoSavedContent];
+  } catch (error) {
+    console.error('Error fetching content:', error);
+    const offlineContent = this.getFromUserLocalStorage(teacherId, 'offline_content') || [];
+    const autoSavedContent = this.getFromUserLocalStorage(teacherId, 'auto_saved_content') || [];
+    return [...offlineContent, ...autoSavedContent];
   }
+}
+
 
   static async deleteGeneratedContent(contentId: string): Promise<void> {
     try {
@@ -685,28 +689,37 @@ export class FirebaseService {
 
   // Generated Images Management
   static async saveGeneratedImage(image: Omit<GeneratedImage, 'id'>): Promise<string> {
-    try {
-      const docRef = await addDoc(collection(db, 'generated_images'), {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+
+    const docRef = await addDoc(
+      collection(db, 'users', user.uid, 'generated_images'),
+      {
         ...image,
         createdAt: serverTimestamp(),
         tags: image.tags || []
-      });
-      return docRef.id;
-    } catch (error) {
-      console.error('Error saving generated image:', error);
-      const user = auth.currentUser;
-      if (user) {
-        const offlineImage = {
-          ...image,
-          id: Date.now().toString(),
-          createdAt: new Date()
-        };
-        this.saveToUserLocalStorage(user.uid, 'offline_images', offlineImage);
-        return offlineImage.id;
       }
-      throw error;
+    );
+    return docRef.id;
+  } catch (error) {
+    console.error('Error saving generated image:', error);
+
+    const user = auth.currentUser;
+    if (user) {
+      const offlineImage = {
+        ...image,
+        id: Date.now().toString(),
+        createdAt: new Date()
+      };
+      this.saveToUserLocalStorage(user.uid, 'offline_images', offlineImage);
+      return offlineImage.id;
     }
+
+    throw error;
   }
+}
+
 
   static async getGeneratedImages(teacherId: string): Promise<GeneratedImage[]> {
     try {
