@@ -13,7 +13,7 @@ export interface StoryRequest {
 
 export interface WorksheetRequest {
   imageData?: string;
-  topic: string;
+  prompt: string;
   subject: string;
   grades: string[];
   language: string;
@@ -96,9 +96,8 @@ export class AIService {
   private static generateEducationalImageFunction = httpsCallable(functions, 'generateEducationalImage');
   private static translateContentFunction = httpsCallable(functions, 'translateContent');
   private static evaluateVoiceReadingFunction = httpsCallable(functions, 'evaluateVoiceReading');
-  private static generateLessonSuggestionsFunction = httpsCallable(functions, 'generateLessonSuggestions');
-  private static generateEducationalGameFunction = httpsCallable(functions, 'generateEducationalGame');
   private static generateLessonImprovementsFunction = httpsCallable(functions, 'generateLessonImprovements');
+  private static generateEducationalGameFunction = httpsCallable(functions, 'generateEducationalGame');
 
   // Story Generation
   static async generateStory(request: StoryRequest): Promise<string> {
@@ -328,7 +327,7 @@ export class AIService {
   }
 
   // Lesson Plan Suggestions
-  static async generateLessonSuggestions(lessonPlan: {
+  static async generateLessonImprovements(lessonPlan: {
     title: string;
     subject: string;
     grade: string;
@@ -342,7 +341,7 @@ export class AIService {
     nextLessonTopics: string[];
   }> {
     try {
-      const result = await this.generateLessonSuggestionsFunction(lessonPlan);
+      const result = await this.generateLessonImprovementsFunction(lessonPlan);
       return (result.data as any);
     } catch (error) {
       console.error('Error generating lesson suggestions:', error);
@@ -377,31 +376,6 @@ export class AIService {
     }
   }
 
-  // Lesson Plan Improvements
-  static async generateLessonImprovements(lessonPlan: any): Promise<{
-    overallFeedback: string;
-    strengthsIdentified: string[];
-    areasForImprovement: string[];
-    enhancedObjectives: string[];
-    additionalActivities: string[];
-    recommendedResources: string[];
-    assessmentEnhancements: string[];
-    timeManagementTips: string[];
-    differentiationStrategies: string[];
-    technologyIntegration: string[];
-    culturalRelevance: string[];
-    safetyConsiderations: string[];
-    extensionActivities: string[];
-    parentEngagement: string[];
-  }> {
-    try {
-      const result = await this.generateLessonImprovementsFunction({ lessonPlan });
-      return (result.data as any);
-    } catch (error) {
-      console.error('Error generating lesson improvements:', error);
-      throw new Error('Failed to generate lesson improvements. Please check your connection and try again.');
-    }
-  }
   // Translation
   static async translateContent(text: string, targetLanguage: string): Promise<string> {
     try {
